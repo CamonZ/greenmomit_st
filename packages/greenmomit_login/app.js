@@ -17,12 +17,6 @@ GreenmomitLogin.register(function(app, auth, database) {
   GreenmomitLogin.routes(app, auth, database);
 
   //We are adding a link to the main menu for all authenticated users
-  GreenmomitLogin.menus.add({
-    title: 'greenmomitLogin example page',
-    link: 'greenmomitLogin example page',
-    roles: ['authenticated'],
-    menu: 'main'
-  });
 
   /**
     //Uncomment to use. Requires meanio@0.3.7 or above
