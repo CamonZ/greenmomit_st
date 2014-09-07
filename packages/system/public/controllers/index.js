@@ -6,8 +6,7 @@ angular.module('mean.system').controller('IndexController', ['$http', '$location
 
     $http.get('/greenmomit_login')
       .success(function(response){
-        console.log(response);
-        $rootScope.user = response;
+        window.user = response;
         $location.url('/dashboard');
       });
   }
