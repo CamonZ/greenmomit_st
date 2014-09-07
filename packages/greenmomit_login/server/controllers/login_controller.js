@@ -1,10 +1,10 @@
 'use strict';
 
 var jsSHA = require('jssha'),
-    http = require('http');
+    request = require('request');
 
 
-var API_URL='https://apist.greenmomit.com';
+var BASE_API_URL='https://apist.greenmomit.com:8443';
 
 function sha1EncryptPassword(loginToken){
   var shaObj = new jsSHA(process.env.USER_PASSWORD, 'TEXT');
@@ -13,27 +13,30 @@ function sha1EncryptPassword(loginToken){
   return hmac;
 }
 
-function loginOptions(URL){
+function loginOptions(ACTION_URL, queryString){
   return {
-    hostname: API_URL,
-    port: 8443,
-    path: URL,
+    url: BASE_API_URL + ACTION_URL,
+    qs: queryString,
     method: 'POST'
   };
 }
 
 function getSessionToken(loginToken, hashedPassword, res){
-  var SESSION_TOKEN_URL = '/momitst/webserviceapi/user/loginToken?loginToken=' + 
-    loginToken +
-    '&password=' +
-    hashedPassword;
+  var SESSION_TOKEN_URL = '/momitst/webserviceapi/user/loginToken';
 
-    var sessionTokenRequest = http.request(
-      loginOptions(SESSION_TOKEN_URL),
-      function(response){
-        var parsedResponse = JSON.parse(response);
-        if(parsedResponse.result === '200'){
-          res.json({sessionToken: parsedResponse.data.sessionToken, loginToken: loginToken, email: parsedResponse.email});
+    var sessionTokenRequest = request(
+      loginOptions(SESSION_TOKEN_URL, {loginToken: loginToken, password: hashedPassword}),
+      function(error, response, body){
+
+        if(response.statusCode === 200){
+
+          var parsedResponse = JSON.parse(body);
+          if(parsedResponse.result === 200){
+            res.json({sessionToken: parsedResponse.data.sessionToken, loginToken: loginToken, email: parsedResponse.email});
+          }
+        }
+        else{
+          res.json(error);
         }
       }
     );
@@ -42,16 +45,26 @@ function getSessionToken(loginToken, hashedPassword, res){
 
 
 function getLoginToken(res){
-  var CONNECT_TOKEN_URL = '/momitst/webserviceapi/user/connect?email=' + process.env.USER_EMAIL;
+  var CONNECT_TOKEN_URL = '/momitst/webserviceapi/user/connect';
 
-  var loginTokenRequest = http.request(
-    loginOptions(CONNECT_TOKEN_URL),
-    function(response){
-      var parsedResponse = JSON.parse(response);
-      if(parsedResponse.result === '200'){
-        var userLoginToken = parsedResponse.data.loginToken;
-        var hashedPassword = sha1EncryptPassword(userLoginToken);
-        getSessionToken(userLoginToken, hashedPassword, res);
+  var opts = loginOptions(CONNECT_TOKEN_URL, {email: process.env.USER_EMAIL});
+
+  console.log('options: ' + JSON.stringify(opts));
+
+  var loginTokenRequest = request(opts, function(error, response, body){
+      if(response.statusCode === 200){
+
+        var parsedResponse = JSON.parse(body);
+        if(parsedResponse.result === 200){
+
+          var userLoginToken = parsedResponse.data.loginToken;
+          var hashedPassword = sha1EncryptPassword(userLoginToken);
+
+          getSessionToken(userLoginToken, hashedPassword, res);
+        }
+      }
+      else{
+        res.json(error);
       }
     }
   );
