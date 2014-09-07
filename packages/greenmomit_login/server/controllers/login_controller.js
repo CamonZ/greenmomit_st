@@ -47,11 +47,9 @@ function getSessionToken(loginToken, hashedPassword, res){
 function getLoginToken(res){
   var CONNECT_TOKEN_URL = '/momitst/webserviceapi/user/connect';
 
-  var opts = loginOptions(CONNECT_TOKEN_URL, {email: process.env.USER_EMAIL});
-
-  console.log('options: ' + JSON.stringify(opts));
-
-  var loginTokenRequest = request(opts, function(error, response, body){
+  var loginTokenRequest = request(
+    loginOptions(CONNECT_TOKEN_URL, {email: process.env.USER_EMAIL}),
+    function(error, response, body){
       if(response.statusCode === 200){
 
         var parsedResponse = JSON.parse(body);
