@@ -27,9 +27,7 @@ function getThermostats(sessionToken, res){
         var parsedResponse = JSON.parse(body);
 
         if(parsedResponse.result === 200){
-          var thermostats = {};
-          _.each(parsedResponse.datas, function(t){ thermostats[t.name] = t; });
-          res.json(thermostats);
+          res.json(parsedResponse.datas);
         }
       }
       else{
