@@ -52,7 +52,6 @@ footer p {
 .thermostat{
   padding: 15px 30px;
   margin-bottom: 15px;
-  cursor: pointer;
 }
 
 .thermostat_details{
@@ -68,6 +67,8 @@ li.thermostat {
   box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.75);
 }
 
+li.thermostat.active{cursor: pointer;}
+
 h1{ font-size: 4em;}
 h2{ font-size: 2.5em;}
 h3{ font-size: 1.1em;}
@@ -80,6 +81,5 @@ h2.temp_reading{
 	color: #FF934D;
 }
 
-.thermostat_header{
-	margin-bottom: 10px;
-}
+.thermostat_header{ margin-bottom: 10px; }
+.details_panel{ cursor: pointer; }
