@@ -94,4 +94,4 @@ exports.show = function(req, res){
 
 exports.historic = function(req, res){
   res.json([]);
-}
+};
