@@ -1,7 +1,10 @@
 <div class="" data-ng-controller="DashboardController">
+  <div ng-show="loading">
+    <h2>Loading data...</h2>
+  </div>
   <ul class='thermostats'>
     <li data-ng-repeat="thermostat in thermostats" ui-route="/thermostats/{{thermostat.id}}" class='thermostat'>
-      <div class='thermostat' ng-click="getTemperatures()">
+      <div class='thermostat' ng-click="getTemperatures(thermostat.id)">
         <input type="hidden" value="{{thermostat.id}}" ng-model="thermostat"></input>
         <h2>
           {{thermostat.name}}
@@ -20,7 +23,7 @@
             <p>{{thermostat.record.temperatureValue}}</p>
           </div>
         </div>
-        <div id="temperature-statistics-{{thermostat.id}}"></div>
+        <div id="temperature-statistics-{{thermostat.id}}" class='temp_stat_graph'></div>
       </div>
     </li>
   </ul>

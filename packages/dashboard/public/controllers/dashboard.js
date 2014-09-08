@@ -3,6 +3,7 @@
 angular.module('mean.dashboard', ['ngLodash']).
   controller('DashboardController', ['$http', '$scope', '$location', 'lodash', 'Global',
   function($http, $scope, $location, lodash, Global) {
+    $scope.loading = true;
     $scope.global = Global;
     $scope.graphs = {};
 
@@ -12,39 +13,32 @@ angular.module('mean.dashboard', ['ngLodash']).
 
     $http.get('/thermostats', { params: { sessionToken: user.sessionToken } }).
       success(function(response){
+        $scope.loading = false;
         $scope.thermostats = response;
-        lodash.each(response, function(val){ $scope.graphs[val.id].visible = false; });
-        console.log(response);
+        lodash.each(response, function(val){ $scope.graphs[val.id] = {visible: true, chart: undefined}; });
       });
 
     $scope.package = {
       name: 'dashboard'
     };
 
-    $scope.getTemperatures = function(){
-      var thermostatId = $scope.thermostat;
+    $scope.getTemperatures = function(thermostatId){
       $http.get('/thermostats/' + thermostatId).success(function(response){
-        if(!$scope.graphs[thermostatId].visible){
-          $scope.graphs[thermostatId].visible = true;
+        var options = {
+          element: 'temperature-statistics-' + thermostatId,
+          xkey: 'timestamp',
+          ykeys: ['temp'],
+          labels: ['Temperature'],
+          data: response
+        };
 
-          var d = [
-            {timestamp: '2014-09-07', temp: 25.7}, 
-            {timestamp: '2014-09-06', temp: 23.7}, 
-            {timestamp: '2014-09-05', temp: 24.7}];
+      if($scope.graphs[thermostatId].chart === undefined){
+        $scope.graphs[thermostatId].chart = new Morris.Line(options);
+        $scope.graphs[thermostatId].chart.redraw();
+      }
+      else
+        $scope.graphs[thermostatId].chart.setData(options.data, true);
 
-          var options = {
-            element: 'temperature-statistics-' + thermostatId,
-            xkey: 'timestamp',
-            ykeys: ['temp'],
-            labels: ['Temperature'],
-            data: d
-          };
-
-          new Morris.Line(options);
-        }
-        else{
-          $scope.graphs[thermostatId].visible = false;
-        }
       });
     };
   }

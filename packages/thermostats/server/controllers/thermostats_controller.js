@@ -18,7 +18,7 @@ function getThermostats(sessionToken, res){
   var THERMOSTATS_URL = '/momitst/webserviceapi/user/' +
     sessionToken + '/thermostats';
 
-  var thermostatsRequest = request(
+  request(
     thermostatOptions(THERMOSTATS_URL, {}),
     function(error, response, body){
       if(response.statusCode === 200){
@@ -37,11 +37,30 @@ function getThermostats(sessionToken, res){
   );
 }
 
+function randomTemp(){
+  var rand = Math.random();
+  rand = rand > 0.2 ? 1 - rand : rand;
+  return (20*(1 + rand));
+}
+
+function randomData(){
+  return [
+    {timestamp: '2014-09-07', temp: randomTemp()},
+    {timestamp: '2014-09-06', temp: randomTemp()},
+    {timestamp: '2014-09-05', temp: randomTemp()},
+    {timestamp: '2014-09-04', temp: randomTemp()},
+    {timestamp: '2014-09-03', temp: randomTemp()},
+    {timestamp: '2014-09-02', temp: randomTemp()},
+    {timestamp: '2014-09-01', temp: randomTemp()},
+    {timestamp: '2014-08-31', temp: randomTemp()},
+    {timestamp: '2014-08-30', temp: randomTemp()}];
+}
+
 exports.index = function(req, res){
   console.log(JSON.stringify(req.query));
   getThermostats(req.query.sessionToken, res);
 };
 
 exports.show = function(req, res){
-  res.json([]);
+  res.json(randomData());
 };
