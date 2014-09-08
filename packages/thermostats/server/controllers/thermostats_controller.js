@@ -41,3 +41,7 @@ exports.index = function(req, res){
   console.log(JSON.stringify(req.query));
   getThermostats(req.query.sessionToken, res);
 };
+
+exports.show = function(req, res){
+  res.json([]);
+};

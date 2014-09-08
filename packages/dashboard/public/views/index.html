@@ -1,4 +1,29 @@
 <div class="" data-ng-controller="DashboardController">
-  
+  <ul class='thermostats'>
+    <li data-ng-repeat="thermostat in thermostats" ui-route="/thermostats/{{thermostat.id}}" class='thermostat'>
+      <div class='thermostat' ng-click="getTemperatures()">
+        <input type="hidden" value="{{thermostat.id}}" ng-model="thermostat"></input>
+        <h2>
+          {{thermostat.name}}
+        </h2>
+        <div class="row">
+          <div class="col-md-2">
+            <label>Address:</label>
+            <p>{{thermostat.address}}</p>
+          </div>
+          <div class="col-md-4">
+            <label>Last Connection:</label>
+            <p>{{thermostat.lastConnection}}</p>
+          </div>
+          <div class="col-md-6">
+            <label>Last Temperature</label>
+            <p>{{thermostat.record.temperatureValue}}</p>
+          </div>
+        </div>
+        <div id="temperature-statistics-{{thermostat.id}}"></div>
+      </div>
+    </li>
+  </ul>
+
 </div>
 
