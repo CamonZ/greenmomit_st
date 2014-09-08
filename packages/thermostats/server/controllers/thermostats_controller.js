@@ -1,7 +1,6 @@
 'use strict';
 
-var request = require('request'),
-    _ = require('lodash');
+var request = require('request');
 
 var BASE_API_URL='https://apist.greenmomit.com:8443';
 
@@ -37,7 +36,32 @@ function getThermostats(sessionToken, res){
   );
 }
 
-function randomTemp(){
+function getThermostatDetails(sessionToken, thermostatId, res){
+  var THERMOSTAT_URL = '/momitst/webserviceapi/thermostat/' + thermostatId;
+
+  request(
+    thermostatOptions(THERMOSTAT_URL, {session: sessionToken}),
+    function(error, response, body){
+      console.log('got a response from the server for the termostat: ' + thermostatId);
+      console.log('statusCode was: ' + response.statusCode);
+      if(response.statusCode === 200){
+        var parsedResponse = JSON.parse(body);
+        console.log('response result was: ' + parsedResponse.result);
+        if(parsedResponse.result === 200) { res.json(parsedResponse.data);}
+        else{
+          console.log('error in result, response was: ' + body);
+          res.json({});
+        }
+      }
+      else{
+        console.log('error was: ' + JSON.Stringify(error));
+        res.json(error);
+      }
+    }
+  );
+}
+
+/*function randomTemp(){
   var rand = Math.random();
   rand = rand > 0.2 ? 1 - rand : rand;
   return (20*(1 + rand));
@@ -54,7 +78,7 @@ function randomData(){
     {timestamp: '2014-09-01', temp: randomTemp()},
     {timestamp: '2014-08-31', temp: randomTemp()},
     {timestamp: '2014-08-30', temp: randomTemp()}];
-}
+}*/
 
 exports.index = function(req, res){
   console.log(JSON.stringify(req.query));
@@ -62,5 +86,12 @@ exports.index = function(req, res){
 };
 
 exports.show = function(req, res){
-  res.json(randomData());
+  getThermostatDetails(
+    req.query.sessionToken,
+    req.params.thermostatId,
+    res);
 };
+
+exports.historic = function(req, res){
+  res.json([]);
+}

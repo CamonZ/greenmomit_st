@@ -49,11 +49,37 @@ footer p {
 	border-color: #78FA89;
 }
 
-li.thermostat {
-  list-style-type: none;
+.thermostat{
   padding: 15px 30px;
   margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.thermostat_details{
   -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.75);
   -moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.75);
   box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.75);
+}
+
+li.thermostat {
+  list-style-type: none;
+  -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.75);
+  box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.75);
+}
+
+h1{ font-size: 4em;}
+h2{ font-size: 2.5em;}
+h3{ font-size: 1.1em;}
+
+h1.thermostat_name{
+	color: #808080;
+}
+
+h2.temp_reading{
+	color: #FF934D;
+}
+
+.thermostat_header{
+	margin-bottom: 10px;
 }

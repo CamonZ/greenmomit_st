@@ -1,0 +1,62 @@
+<div class="" data-ng-controller="ThermostatsController">
+  <div class='thermostat thermostat_details'>
+    <div class="row thermostat_header">
+      <div class="col-md-4">
+        <h1 class="thermostat_name">
+          {{thermostat.name}}
+        </h1>
+      </div>
+      <div class="col-md-2 col-md-offset-6">
+        <h2 class="temp_reading">
+          {{thermostat.record.temperatureValue}}
+        </h2>
+      </div>
+    </div>
+    <div class="temperature_synopsis">
+      <h2>
+        Temperature Details
+      </h2>
+      <div class="row temperature_details">
+        <div class="col-md-3">
+          <label>Last Temperature:</label>
+          <p>{{thermostat.record.temperatureValue}}</p>
+        </div>
+        <div class="col-md-3">
+          <label>Last Out Temperature:</label>
+          <p>{{thermostat.record.temperatureOutValue}}</p>
+        </div>
+      </div>
+      <div id="temperature-statistics" class='stat_graph'></div>
+    </div>
+    <div class="humidity_sinopsis">
+      <h2>
+        Humidity Details
+      </h2>
+      <div class="row humidity_details">
+        <div class="col-md-3">
+          <label>Last Humidity:</label>
+          <p>{{thermostat.record.humidityValue}}</p>
+        </div>
+        <div class="col-md-3">
+          <label>Last Out Humidity:</label>
+          <p>{{thermostat.record.humidityOutValue}}</p>
+        </div>
+      </div>
+      <div id="humidity-statistics" class='stat_graph'></div>
+    </div>
+
+    <div class="row misc_synopsis">
+      <h2>
+        Misc. Details
+      </h2>
+      <div class="col-md-3">
+        <label>Last Connection:</label>
+        <p>{{thermostat.record.recordTime}}</p>
+      </div>
+      <div class="col-md-3">
+        <label>Relays:</label>
+        <p>{{thermostat.record.relays}}</p>
+      </div>
+    </div>
+  </div>
+</div>

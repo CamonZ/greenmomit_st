@@ -22,24 +22,6 @@ angular.module('mean.dashboard', ['ngLodash']).
       name: 'dashboard'
     };
 
-    $scope.getTemperatures = function(thermostatId){
-      $http.get('/thermostats/' + thermostatId).success(function(response){
-        var options = {
-          element: 'temperature-statistics-' + thermostatId,
-          xkey: 'timestamp',
-          ykeys: ['temp'],
-          labels: ['Temperature'],
-          data: response
-        };
-
-      if($scope.graphs[thermostatId].chart === undefined){
-        $scope.graphs[thermostatId].chart = new Morris.Line(options);
-        $scope.graphs[thermostatId].chart.redraw();
-      }
-      else
-        $scope.graphs[thermostatId].chart.setData(options.data, true);
-
-      });
-    };
+    $scope.getTemperatures = function(thermostatId){ $location.url('/thermostats/' + thermostatId); };
   }
 ]);
