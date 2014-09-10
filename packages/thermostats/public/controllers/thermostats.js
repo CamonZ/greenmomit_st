@@ -17,6 +17,6 @@ angular.module('mean.thermostats', ['ngLodash']).
       name: 'dashboard'
     };
 
-    $scope.showThermostatData = function(){ Morris.Line(options); };
+    $scope.showThermostatData = function(){ };
   }
 ]);
