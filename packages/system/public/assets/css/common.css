@@ -55,16 +55,16 @@ footer p {
 }
 
 .thermostat_details{
-  -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.75);
-  -moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.75);
-  box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.75);
+  -webkit-box-shadow: 2px 2px 3px 0 rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    2px 2px 3px 0 rgba(50, 50, 50, 0.75);
+  box-shadow:         2px 2px 3px 0 rgba(50, 50, 50, 0.75);
 }
 
 li.thermostat {
   list-style-type: none;
-  -webkit-box-shadow: 2px 2px 3px 0px rgba(50, 50, 50, 0.75);
-  -moz-box-shadow:    2px 2px 3px 0px rgba(50, 50, 50, 0.75);
-  box-shadow:         2px 2px 3px 0px rgba(50, 50, 50, 0.75);
+  -webkit-box-shadow: 2px 2px 3px 0 rgba(50, 50, 50, 0.75);
+  -moz-box-shadow:    2px 2px 3px 0 rgba(50, 50, 50, 0.75);
+  box-shadow:         2px 2px 3px 0 rgba(50, 50, 50, 0.75);
 }
 
 li.thermostat.active{cursor: pointer;}
