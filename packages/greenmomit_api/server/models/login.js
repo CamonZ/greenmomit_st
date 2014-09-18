@@ -32,7 +32,7 @@ function getSessionToken(loginToken, hashedPassword, done){
 
           var parsedResponse = JSON.parse(body);
           if(parsedResponse.result === 200){
-            done.json({sessionToken: parsedResponse.data.sessionToken, loginToken: loginToken, email: parsedResponse.email});
+            done({sessionToken: parsedResponse.data.sessionToken, loginToken: loginToken, email: parsedResponse.email});
           }
         }
         else{

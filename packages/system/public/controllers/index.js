@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('mean.system').controller('IndexController', ['$http', '$location', '$scope', '$rootScope', 'Global',
-  function($http, $location, $scope, $rootScope, Global) {
+angular.module('mean.system').controller('IndexController', ['$http', '$location', '$scope', 'Global',
+  function($http, $location, $scope, Global) {
     $scope.global = Global;
 
     $http.get('/greenmomit_login')
