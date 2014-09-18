@@ -12,55 +12,53 @@ var kue = require('kue'),
 
 
 kue.redis.createClient = function() {
-    var redisUrl = url.parse(process.env.REDISTOGO_URL)
-      , client = redis.createClient(redisUrl.port, redisUrl.hostname);
-    if (redisUrl.auth) {
-        client.auth(redisUrl.auth.split(":")[1]);
-    }
+    var redisUrl = url.parse(process.env.REDISTOGO_URL),
+        client = redis.createClient(redisUrl.port, redisUrl.hostname);
+    if (redisUrl.auth) client.auth(redisUrl.auth.split(':')[1]);
     return client;
 };
 
 var jobs = kue.createQueue();
 
 var thermostatAttributesMap = { 
-  "id": "greenMomitId",
-  "type": "greenMomitType",
-  "userId": "greenMomitUserId",
-  "name": "name",
-  "alarms": "alarms",
-  "shared": "shared",
-  "address": "address",
-  "invited": "invited",
-  "active": "active",
-  "connected": "connected",
-  "lastConnection": "lastConnection",
-  "parameters": "parameters"
+  'id': 'greenMomitId',
+  'type': 'greenMomitType',
+  'userId': 'greenMomitUserId',
+  'name': 'name',
+  'alarms': 'alarms',
+  'shared': 'shared',
+  'address': 'address',
+  'invited': 'invited',
+  'active': 'active',
+  'connected': 'connected',
+  'lastConnection': 'lastConnection',
+  'parameters': 'parameters'
 };
 
 var measurementAttributes = [
-  "recordTime",
-  "temperatureValue",
-  "humidityValue",
-  "relays",
-  "temperatureSetPointValue",
-  "tminHeatValue",
-  "tmaxHeatValue",
-  "tminColdValue",
-  "tmaxColdValue",
-  "workingModeValue",
-  "presenceModeTimeValue",
-  "useModeValue",
-  "tempUnitValue",
-  "temperature2Value",
-  "luminosityValue",
-  "hardwareStateValue",
-  "proximityValue",
-  "savingTimesValue",
-  "WiFi_RSSIValue",
-  "LCD_StateValue",
-  "stateValue",
-  "Usual_Night_LuminosityValue",
-  "WifiVersionValue"
+  'recordTime',
+  'temperatureValue',
+  'humidityValue',
+  'relays',
+  'temperatureSetPointValue',
+  'tminHeatValue',
+  'tmaxHeatValue',
+  'tminColdValue',
+  'tmaxColdValue',
+  'workingModeValue',
+  'presenceModeTimeValue',
+  'useModeValue',
+  'tempUnitValue',
+  'temperature2Value',
+  'luminosityValue',
+  'hardwareStateValue',
+  'proximityValue',
+  'savingTimesValue',
+  'WiFi_RSSIValue',
+  'LCD_StateValue',
+  'stateValue',
+  'Usual_Night_LuminosityValue',
+  'WifiVersionValue'
 ];
 
 
@@ -77,7 +75,7 @@ function localMeasurementData(remoteData, thermostatId){
   return localData;
 }
 
-function upsertMeasurement(thermostat){
+function upsertMeasurement(thermostat, data){
 
   var errorHandler = function(error){
     console.error(
@@ -85,7 +83,7 @@ function upsertMeasurement(thermostat){
       thermostat.greenMomitId +
       ' and recordTime: ' +
       measurementData.recordTime);
-  }
+  };
 
   var measurementData = localMeasurementData(data.record, thermostat._id);
   var queryParams = {recordTime: measurementData.recordTime};
@@ -115,11 +113,11 @@ setInterval(function(){
               {upsert: true},
               function(error, thermostat){
                 if(error !== null || error !== undefined)
-                  upsertMeasurement(thermostat);
+                  upsertMeasurement(thermostat, thermostatData);
                 else
                   console.error('error updating the termostat with greenMomitId: ' + thermostatData.greenMomitId);
             });
-          })
+          });
         });
       });
       done();
