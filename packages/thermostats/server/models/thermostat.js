@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
 
 var ThermostatSchema = new Schema({
   greenMomitId: {
-    type: [String],
+    type: String,
     required: true
   },
   greenMomitType: {
@@ -53,6 +53,7 @@ var ThermostatSchema = new Schema({
   parameters:{}
 });
 
+ThermostatSchema.index({greenMomitId: 1}, {unique: true, safe: true});
 
 ThermostatSchema.methods = {
   //just return the query on the assoc so I can execute it on the caller.
