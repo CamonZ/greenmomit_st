@@ -106,10 +106,4 @@ var ThermostatMeasurementSchema = new Schema({
 //compound index based on thermostatId and the recordTime
 ThermostatMeasurementSchema.index({thermostatId: 1, recordTime: -1});
 
-ThermostatMeasurementSchema.pre('validate', function(next) {
-  var stringDate = this.recordTime;
-  this.recordTime = new Date(stringDate);
-  next();
-});
-
 module.exports = mongoose.model('ThermostatMeasurement', ThermostatMeasurementSchema);
