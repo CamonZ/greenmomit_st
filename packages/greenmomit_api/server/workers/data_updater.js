@@ -1,24 +1,16 @@
 'use strict';
 
-var kue = require('kue'),
-    url = require('url'),
-    redis = require('kue/node_modules/redis'),
+var url = require('url'),
     mongoose = require('mongoose'),
     apiLogin = require('../models/login'),
     apiThermostats = require('../models/thermostat'),
+    thermostats = require('../../../thermostats/server/models/thermostat'),
     Thermostat = mongoose.model('Thermostat'),
     ThermostatMeasurement = mongoose.model('ThermostatMeasurement'),
     _ = require('lodash');
 
 
-kue.redis.createClient = function() {
-    var redisUrl = url.parse(process.env.REDISTOGO_URL),
-        client = redis.createClient(redisUrl.port, redisUrl.hostname);
-    if (redisUrl.auth) client.auth(redisUrl.auth.split(':')[1]);
-    return client;
-};
-
-var jobs = kue.createQueue();
+mongoose.connect(process.env.MONGOLAB_URI);
 
 var thermostatAttributesMap = { 
   'id': 'greenMomitId',
@@ -64,27 +56,35 @@ var measurementAttributes = [
 
 function localThermostatData(remoteData){
   var localData = {};
-  _.forEachIn(thermostatAttributesMap, function(k, v){ localData[v] = remoteData[k]; });
+
+  _.forIn(thermostatAttributesMap, function(localKey, remoteKey, obj){ 
+    localData[localKey] = remoteData[remoteKey]; 
+  });
+  
+  localData.lastConnection = new Date(localData.lastConnection);
   return localData;
 }
 
 function localMeasurementData(remoteData, thermostatId){
   var localData = {};
   _.forEach(measurementAttributes, function(key){ localData[key] = remoteData[key]; });
+
   localData.thermostatId = thermostatId;
+  localData.recordTime = new Date(localData.recordTime);
   return localData;
 }
 
 function upsertMeasurement(thermostat, data){
-
+  console.log('upserting the measurement data');
   var errorHandler = function(error){
-    console.error(
-      'error upserting the measurement for thermostat: ' +
-      thermostat.greenMomitId +
-      ' and recordTime: ' +
-      measurementData.recordTime);
+    if(error)
+      console.error(
+        'error upserting the measurement for thermostat: ' +
+        thermostat.greenMomitId +
+        ' and recordTime: ' +
+        measurementData.recordTime);
   };
-
+  
   var measurementData = localMeasurementData(data.record, thermostat._id);
   var queryParams = {recordTime: measurementData.recordTime};
   var queryOptions = {upsert: true};
@@ -94,34 +94,30 @@ function upsertMeasurement(thermostat, data){
 
 
 setInterval(function(){
-  var job = jobs.create('updateThermostats', {});
+      
+  console.log('processing the data update');
 
-  jobs.process('updateThermostats',
-    function(job, done, ctx) {
-
-      apiLogin.beginLoginProcess(function(loginData){
-
-        apiThermostats.getThermostats(loginData.sessionToken, function(thermostatsData){
-
-          _.forEach(thermostatsData, function(data){
-
-            var thermostatData = localThermostatData(data);
-
-            Thermostat.findOneAndUpdate(
-              {greenMomitId: thermostatData.greenMomitId},
-              thermostatData,
-              {upsert: true},
-              function(error, thermostat){
-                if(error !== null || error !== undefined)
-                  upsertMeasurement(thermostat, thermostatData);
-                else
-                  console.error('error updating the termostat with greenMomitId: ' + thermostatData.greenMomitId);
-            });
-          });
+  apiLogin.beginLoginProcess(function(loginData){
+    
+    apiThermostats.getThermostats(loginData.sessionToken, function(thermostatsData){
+      _.forEach(thermostatsData, function(data){
+        
+        var thermostatData = localThermostatData(data);
+        
+        Thermostat.findOneAndUpdate(
+          {greenMomitId: thermostatData.greenMomitId},
+          thermostatData,
+          {upsert: true, new: true},
+          function(error, thermostat){
+            if(error !== null || error !== undefined)
+              upsertMeasurement(thermostat, data);
+            else
+              console.error('error updating the termostat with greenMomitId: ' + thermostatData.greenMomitId);
         });
       });
-      done();
-    }
-  );
+    });
+  });
+
+
 }, 300000); // 300k ms or 5 mins
 
