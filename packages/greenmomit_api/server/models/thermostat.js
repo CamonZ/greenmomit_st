@@ -25,11 +25,11 @@ exports.getThermostats = function(sessionToken, done){
         var parsedResponse = JSON.parse(body);
 
         if(parsedResponse.result === 200){
-          done.json(parsedResponse.datas);
+          done(parsedResponse.datas);
         }
       }
       else{
-        done.json(error);
+        done(error);
       }
     }
   );
@@ -45,15 +45,15 @@ exports.getThermostatDetails = function(sessionToken, thermostatId, done){
 
         var parsedResponse = JSON.parse(body);
 
-        if(parsedResponse.result === 200) { done.json(parsedResponse.data);}
+        if(parsedResponse.result === 200) { done(parsedResponse.data);}
         else{
           console.log('error in result, response was: ' + body);
-          done.json({});
+          done(error);
         }
       }
       else{
         console.log('error was: ' + JSON.Stringify(error));
-        done.json(error);
+        done(error);
       }
     }
   );
