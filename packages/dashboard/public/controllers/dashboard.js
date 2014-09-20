@@ -7,15 +7,11 @@ angular.module('mean.dashboard', ['ngLodash']).
     $scope.global = Global;
     $scope.graphs = {};
 
-    var user = window.user;
-
-    if(user.sessionToken === undefined) $location.url('/'); //ensure the user is set
-
-    $http.get('/thermostats', { params: { sessionToken: user.sessionToken } }).
+    $http.get('/thermostats').
       success(function(response){
         $scope.loading = false;
         $scope.thermostats = response;
-        lodash.each(response, function(val){ $scope.graphs[val.id] = {visible: true, chart: undefined}; });
+        //lodash.each(response, function(val){ $scope.graphs[val.id] = {visible: true, chart: undefined}; });
       });
 
     $scope.package = {
