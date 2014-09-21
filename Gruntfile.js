@@ -1,10 +1,18 @@
 'use strict';
 
 var paths = {
-  js: ['*.js', 'test/**/*.js', '!test/coverage/**', '!bower_components/**', 'packages/**/*.js', '!packages/**/node_modules/**', '!packages/contrib/**/*.js', '!packages/contrib/**/node_modules/**'],
+  js: ['*.js', 'test/**/*.js', 'spec/**/*.js', '!test/coverage/**', '!bower_components/**', 'packages/**/*.js', '!packages/**/node_modules/**', '!packages/contrib/**/*.js', '!packages/contrib/**/node_modules/**'],
   html: ['packages/**/public/**/views/**', 'packages/**/server/views/**'],
-  css: ['!bower_components/**', 'packages/**/public/**/css/*.css', '!packages/contrib/**/public/**/css/*.css']
+  css: ['!bower_components/**', 'packages/**/public/**/css/*.css', '!packages/contrib/**/public/**/css/*.css'],
+  server_specs: ['packages/**/server/tests/**/*.js', 'packages/**/server/specs/**/*.js']
 };
+
+var specs_require = [
+  'server.js',
+  function() {
+    require('meanio/lib/util').preload(__dirname + '/packages/**/server', 'model');
+  }
+];
 
 module.exports = function(grunt) {
 
@@ -38,6 +46,10 @@ module.exports = function(grunt) {
         options: {
           livereload: true
         }
+      },
+      test: {
+        files: paths.js,
+        tasks: ['env:test', 'mochaTest']
       }
     },
     jshint: {
@@ -88,15 +100,10 @@ module.exports = function(grunt) {
     },
     mochaTest: {
       options: {
-        reporter: 'spec',
-        require: [
-          'server.js',
-          function() {
-            require('meanio/lib/util').preload(__dirname + '/packages/**/server', 'model');
-          }
-        ]
+        reporter: 'dot',
+        require: specs_require
       },
-      src: ['packages/**/server/tests/**/*.js']
+      src: paths.server_specs
     },
     env: {
       test: {
@@ -116,9 +123,20 @@ module.exports = function(grunt) {
   //Default task(s).
   if (process.env.NODE_ENV === 'production') {
     grunt.registerTask('default', ['clean', 'cssmin', 'uglify', 'concurrent']);
-  } else {
+  } 
+  else {
     grunt.registerTask('default', ['clean', 'jshint', 'csslint', 'concurrent']);
   }
+
+  var defaultTestSrc = grunt.config('mochaTest.test.src');
+
+  grunt.event.on('watch', function(action, filepath) {
+    grunt.config('jshint.all.src', filepath);
+    grunt.config('mochaTest.test.src', defaultTestSrc);
+        
+    if(filepath.match('test/') || filepath.match('specs/'))
+      grunt.config('mochaTest.test.src', filepath);
+  });
 
   //Test task.
   grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit']);
