@@ -19,7 +19,10 @@ function getRandomString(len) {
  */
 var should = require('should'),
   mongoose = require('mongoose'),
-  User = mongoose.model('User');
+  User = mongoose.model('User'),
+  config = require('meanio').loadConfig();
+
+require('mocha-mongoose')(config.db);
 
 /**
  * Globals
