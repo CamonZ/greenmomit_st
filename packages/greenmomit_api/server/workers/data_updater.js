@@ -1,5 +1,7 @@
 'use strict';
 
+require('../../../thermostats/server/models/thermostat');
+
 var mongoose = require('mongoose'),
     apiLogin = require('../models/login'),
     apiThermostats = require('../models/thermostat'),
@@ -7,7 +9,6 @@ var mongoose = require('mongoose'),
     ThermostatMeasurement = mongoose.model('ThermostatMeasurement'),
     _ = require('lodash');
 
-require('../../../thermostats/server/models/thermostat');
 
 
 mongoose.connect(process.env.MONGOLAB_URI);
