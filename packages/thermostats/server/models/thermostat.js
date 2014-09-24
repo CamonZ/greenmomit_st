@@ -50,6 +50,22 @@ var ThermostatSchema = new Schema({
     type: Date,
     require: true
   },
+  lastTemperature: {
+    type: Number,
+    required: true
+  },
+  lastHumidity: {
+    type: Number,
+    required: true
+  },
+  lastOutTemperature: {
+    type: Number,
+    required: true
+  },
+  lastOutHumidity: {
+    type: Number,
+    required: true
+  },  
   parameters:{}
 });
 
