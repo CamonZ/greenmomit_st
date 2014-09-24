@@ -3,8 +3,8 @@
     <h2>Loading data...</h2>
   </div>
   <ul class='thermostats'>
-    <li data-ng-repeat="thermostat in thermostats" ui-route="/thermostats/{{thermostat.id}}" class="thermostat {{thermostat.connected ? 'active' : ''}}">
-      <div class='thermostat' ng-click="getTemperatures(thermostat.id)">
+    <li data-ng-repeat="thermostat in thermostats" ui-route="/thermostats/{{thermostat._id}}" class="thermostat {{thermostat.connected ? 'active' : ''}}">
+      <div class='thermostat' ng-click="getTemperatures(thermostat._id)">
       <div class="row thermostat_header">
         <div class="col-md-8">
           <h1 class="thermostat_name">
@@ -13,7 +13,7 @@
         </div>
         <div class="col-md-2 col-md-offset-2">
           <h2 class="temp_reading">
-            {{thermostat.record.temperatureValue}}
+            {{thermostat.lastTemperature}}
           </h2>
         </div>
       </div>
@@ -28,7 +28,7 @@
           </div>
           <div class="col-md-6">
             <label>Last Temperature</label>
-            <p>{{thermostat.record.temperatureValue}}</p>
+            <p>{{thermostat.lastTemperature}}</p>
           </div>
         </div>
       </div>

@@ -5,7 +5,6 @@ angular.module('mean.dashboard', ['ngLodash']).
   function($http, $scope, $location, lodash, Global) {
     $scope.loading = true;
     $scope.global = Global;
-    $scope.graphs = {};
 
     $http.get('/thermostats').
       success(function(response){
