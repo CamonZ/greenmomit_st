@@ -2,7 +2,7 @@
   "name": "mean",
   "version": "0.4.0",
   "dependencies": {
-    "jquery": "1.x",
+    "jquery": ">2.1.0",
     "angular": "latest",
     "angular-resource": "latest",
     "angular-cookies": "latest",
@@ -10,6 +10,8 @@
     "angular-route": "latest",
     "bootstrap": "3.1.1",
     "angular-bootstrap": "0.11.0",
-    "angular-ui-router": "#master"
+    "angular-ui-router": "#master",
+    "morris.js": "*",
+    "ng-lodash": "*"
   }
 }
