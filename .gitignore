@@ -54,3 +54,4 @@ modules/public/
 modules/views/
 /public/build/
 .env
+*.json
