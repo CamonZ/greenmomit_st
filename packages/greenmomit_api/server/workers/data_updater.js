@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
     apiThermostats = require('../models/thermostat'),
     Thermostat = mongoose.model('Thermostat'),
     ThermostatMeasurement = mongoose.model('ThermostatMeasurement'),
-    _ = require('lodash');
+    _ = require('lodash'),
+    async = require('async');
 
 
 
@@ -54,15 +55,29 @@ var measurementAttributes = [
   'WifiVersionValue'
 ];
 
+function properDate(dateString){
+  return new Date(dateString.replace('UTC', 'Z'));
+}
 
-function localThermostatData(remoteData){
+
+
+function localThermostatData(dataFromCollection, dataFromItem){
   var localData = {};
 
   _.forIn(thermostatAttributesMap, function(localKey, remoteKey, obj){ 
-    localData[localKey] = remoteData[remoteKey]; 
+    localData[localKey] = dataFromCollection[remoteKey]; 
   });
   
-  localData.lastConnection = new Date(localData.lastConnection);
+  
+  console.log('lastConnection: ' + properDate(dataFromCollection.lastConnection));
+
+  localData.lastConnection = properDate(dataFromCollection.lastConnection);
+  localData.lastTemperature = dataFromItem.data.record.temperatureValue;
+  localData.lastHumidity = dataFromItem.data.record.humidityValue;
+  localData.lastOutTemperature = dataFromItem.data.record.temperatureOutValue;
+  localData.lastOutHumidity = dataFromItem.data.record.humidityOutValue;
+  localData.parameters = dataFromItem.data.parameters;
+
   return localData;
 }
 
@@ -71,19 +86,25 @@ function localMeasurementData(remoteData, thermostatId){
   _.forEach(measurementAttributes, function(key){ localData[key] = remoteData[key]; });
 
   localData.thermostatId = thermostatId;
-  localData.recordTime = new Date(localData.recordTime);
+  localData.recordTime = properDate(localData.recordTime);
+
   return localData;
 }
 
-function upsertMeasurement(thermostat, data){
+function upsertMeasurement(thermostat, data, done){
   console.log('upserting the measurement data');
   var errorHandler = function(error){
-    if(error)
+    if(error){
       console.error(
         'error upserting the measurement for thermostat: ' +
         thermostat.greenMomitId +
         ' and recordTime: ' +
         measurementData.recordTime);
+      done(error, '');
+    }
+    else{
+      done(null, '');
+    }
   };
   
   var measurementData = localMeasurementData(data.record, thermostat._id);
@@ -93,32 +114,35 @@ function upsertMeasurement(thermostat, data){
   ThermostatMeasurement.update(queryParams, measurementData, queryOptions, errorHandler);
 }
 
-
-setInterval(function(){
-      
-  console.log('processing the data update');
-
-  apiLogin.beginLoginProcess(function(loginData){
+function processDataFromCollection(dataFromCollection, loginData, done){
+  apiThermostats.getThermostatDetails(loginData.sessionToken, dataFromCollection.id, function(dataFromThermostat){
+    var thermostatData = localThermostatData(dataFromCollection, dataFromThermostat);
     
-    apiThermostats.getThermostats(loginData.sessionToken, function(thermostatsData){
-      _.forEach(thermostatsData, function(data){
-        
-        var thermostatData = localThermostatData(data);
-        
-        Thermostat.findOneAndUpdate(
-          {greenMomitId: thermostatData.greenMomitId},
-          thermostatData,
-          {upsert: true, new: true},
-          function(error, thermostat){
-            if(error !== null || error !== undefined)
-              upsertMeasurement(thermostat, data);
-            else
-              console.error('error updating the termostat with greenMomitId: ' + thermostatData.greenMomitId);
-        });
-      });
+    Thermostat.findOneAndUpdate(
+      {greenMomitId: thermostatData.greenMomitId},
+      thermostatData,
+      {upsert: true, new: true},
+      function(error, thermostat){
+        if(error === null || error === undefined && (thermostat._id !== null && thermostat._id !== undefined))
+          upsertMeasurement(thermostat, dataFromCollection, done);
+        else
+          console.error('error updating the termostat with greenMomitId: ' + thermostatData.greenMomitId);
     });
   });
+}
 
 
-}, 300000); // 300k ms or 5 mins
+console.log('processing the data update');
+apiLogin.beginLoginProcess(function(loginData){
+  
+  apiThermostats.getThermostats(loginData.sessionToken, function(thermostatsData){
 
+    var functions = [];
+
+    _.forEach(thermostatsData, function(dataFromCollection){
+      functions.push(processDataFromCollection.bind(null, dataFromCollection, loginData));
+    });
+
+    async.parallel(functions, function(err, result){ process.exit(); });
+  });
+});
