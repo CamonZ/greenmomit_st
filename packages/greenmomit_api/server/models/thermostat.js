@@ -45,7 +45,7 @@ exports.getThermostatDetails = function(sessionToken, thermostatId, done){
 
         var parsedResponse = JSON.parse(body);
 
-        if(parsedResponse.result === 200) { done(parsedResponse.data);}
+        if(parsedResponse.result === 200) { done(parsedResponse);}
         else{
           console.log('error in result, response was: ' + body);
           done(error);
