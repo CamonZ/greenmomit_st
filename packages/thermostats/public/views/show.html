@@ -8,7 +8,7 @@
       </div>
       <div class="col-md-2 col-md-offset-6">
         <h2 class="temp_reading">
-          {{thermostat.record.temperatureValue}}
+          {{thermostat.lastTemperature}}
         </h2>
       </div>
     </div>
@@ -19,11 +19,11 @@
       <div class="row temperature_details details_panel">
         <div class="col-md-3">
           <label>Last Temperature:</label>
-          <p>{{thermostat.record.temperatureValue}}</p>
+          <p>{{thermostat.lastTemperature}}</p>
         </div>
         <div class="col-md-3">
           <label>Last Out Temperature:</label>
-          <p>{{thermostat.record.temperatureOutValue}}</p>
+          <p>{{thermostat.lastOutTemperature}}</p>
         </div>
       </div>
       <div id="temperature-statistics" class='stat_graph'></div>
@@ -35,11 +35,11 @@
       <div class="row humidity_details">
         <div class="col-md-3">
           <label>Last Humidity:</label>
-          <p>{{thermostat.record.humidityValue}}</p>
+          <p>{{thermostat.lastHumidity}}</p>
         </div>
         <div class="col-md-3">
           <label>Last Out Humidity:</label>
-          <p>{{thermostat.record.humidityOutValue}}</p>
+          <p>{{thermostat.lastOutHumidity}}</p>
         </div>
       </div>
       <div id="humidity-statistics" class='stat_graph'></div>
@@ -51,11 +51,11 @@
       </h2>
       <div class="col-md-3">
         <label>Last Connection:</label>
-        <p>{{thermostat.record.recordTime}}</p>
+        <p>{{thermostat.historic_temperatures[0].recordTime}}</p>
       </div>
       <div class="col-md-3">
         <label>Relays:</label>
-        <p>{{thermostat.record.relays}}</p>
+        <p>{{thermostat.historic_temperatures[0].relays}}</p>
       </div>
     </div>
   </div>

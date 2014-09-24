@@ -4,17 +4,19 @@ angular.module('mean.thermostats', ['ngLodash']).
   controller('ThermostatsController', ['$http', '$scope', '$location', '$stateParams', 'lodash', 'Global',
   function($http, $scope, $location, $stateParams, lodash, Global) {
     $scope.global = Global;
-    $scope.graphs = {};
 
-    var user = window.user;
+    $http.get('/thermostats/' + $stateParams.thermostatId).
+      success(function(response){ 
+        $scope.thermostat = response; 
+      });
 
-    if(user.sessionToken === undefined) $location.url('/'); //ensure the user is set
-
-    $http.get('/thermostats/' + $stateParams.thermostatId, { params: { sessionToken: user.sessionToken } }).
-      success(function(response){ $scope.thermostat = response; });
+    $http.get('/thermostats/' + $stateParams.thermostatId + '/historic_temperatures').
+      success(function(response){ 
+        $scope.thermostat.historic_temperatures = response; 
+      });
 
     $scope.package = {
-      name: 'dashboard'
+      name: 'thermostats'
     };
 
     $scope.showThermostatData = function(){ };
