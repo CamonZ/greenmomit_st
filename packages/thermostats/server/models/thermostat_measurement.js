@@ -10,7 +10,7 @@ var ThermostatMeasurementSchema = new Schema({
     required: true
   },
   recordTime: {
-    type: [Date],
+    type: Date,
     required: true
   },
   temperatureValue: {

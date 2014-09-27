@@ -77,9 +77,7 @@ ThermostatSchema.methods = {
     return Measurement.find({thermostatId: this._id});
   },
   measurementsFromToDate: function(startDate, endDate){
-    return Measurement.find({
-      thermostatId: this._id,
-      date: { $gte: new Date(startDate), $lt: new Date(endDate) }});
+    return this.measurements().where({recordTime: {$gte: new Date(startDate), $lt: new Date(endDate)}});
   },
   addMeasurement: function(measurementData){
     measurementData.thermostatId = this._id;
