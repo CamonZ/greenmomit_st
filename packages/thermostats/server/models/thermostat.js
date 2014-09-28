@@ -79,14 +79,12 @@ ThermostatSchema.methods = {
   measurementsFromToDate: function(startDate, endDate){
     return this.measurements().where({recordTime: {$gte: new Date(startDate), $lt: new Date(endDate)}});
   },
-  addMeasurement: function(measurementData){
+  addMeasurement: function(measurementData, done){
     measurementData.thermostatId = this._id;
-   var measurement = new Measurement(measurementData);
+    var measurement = new Measurement(measurementData);
     measurement.save(function(err, data){
-      if(err) console.error('error saving record ' +
-        measurementData.recordTime +
-        ' for thermostat ' +
-        measurementData.thermostatId);
+      if(err){ done(err); }
+      else{ done();}
     });
   }
 };
