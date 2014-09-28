@@ -31,19 +31,19 @@ var ThermostatMeasurementSchema = new Schema({
   },
   tMinHeatValue: {
     type: Number,
-    required: true
+    required: false
   },
   tMaxHeatValue: {
     type: Number,
-    required: true
+    required: false
   },
   tMinColdValue: {
     type: Number,
-    required: true
+    required: false
   },
   tMaxColdValue: {
     type: Number,
-    required: true
+    required: false
   },
   workingModeValue: {
     type: Number,
