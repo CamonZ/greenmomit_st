@@ -7,12 +7,28 @@ require('mocha-mongoose')(config.db);
 var mongoose = require('mongoose'),
     Thermostat = mongoose.model('Thermostat'),
     chai = require('chai'),
-    sharedMeasurementSpecs = require('./thermostat_measurements_finders_shared_spec.js');
+    sharedMeasurementSpecs = require('./thermostat_measurements_finders_shared_spec.js'),
+    fs = require('fs');
 
 describe('Models', function(){
   
   describe('Thermostat', function(){
-    
+    before(function(done){
+      var that = this, thermostatFile = __dirname + '/sampleThermostat.json';
+
+      fs.readFile(thermostatFile, 'utf8', function(err, data){
+        if(err){ done(err); }
+        else{
+          var parsedData = JSON.parse(data);
+          parsedData.lastConnection = new Date(parsedData.lastConnection);
+          that.sampleThermostat = new Thermostat(parsedData);
+          that.sampleThermostat.save(function(err, doc){
+            if(err) done(err);
+            done();
+          });
+        }
+      });
+    });
     describe('schema methods', function(){
       before(function(){ this.thermostat = new Thermostat({}); });
 
@@ -36,10 +52,40 @@ describe('Models', function(){
           chai.expect(this.measurements._conditions.recordTime.$lt.toISOString()).to.eq(endDate);
         });
       });
+
+      describe('.addMeasurement', function(){
+        before(function(done){
+          var that = this;
+          var measurementFile = __dirname + '/sampleMeasurement.json';
+          if(this.sampleThermostat !== undefined && 
+             this.sampleThermostat !== null){
+            
+            fs.readFile(measurementFile, 'utf8', function(err, data){
+              if(err) done('error reading sample measurement file');
+              that.sampleMeasurementData = JSON.parse(data);
+              that.sampleMeasurementData.recordTime = new Date(that.sampleMeasurementData.recordTime);
+              done();
+            });
+          }
+          else{
+            done('Sample thermostat is not defined');
+          }
+        });
+
+        it('should add a measurement to the thermostat', function(done){
+          var that = this, callback = function(err, measurement){
+            if(err) done(err);
+            chai.expect(measurement.thermostatId).to.eq(that.sampleThermostat._id);
+            done();
+          };
+
+          this.sampleThermostat.addMeasurement(this.sampleMeasurementData, callback);
+        });
+      });
     });
 
     describe('.save', function(){
-      it('should exist', function(){
+      it('should save the object', function(){
         var thermostat = new Thermostat({});
         chai.expect(thermostat).to.be.an.instanceof(Thermostat);
       });

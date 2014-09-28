@@ -82,9 +82,9 @@ ThermostatSchema.methods = {
   addMeasurement: function(measurementData, done){
     measurementData.thermostatId = this._id;
     var measurement = new Measurement(measurementData);
-    measurement.save(function(err, data){
-      if(err){ done(err); }
-      else{ done();}
+    measurement.save(function(err, doc){
+      if(err){ done(err, null); }
+      else{ done(err, doc);}
     });
   }
 };
