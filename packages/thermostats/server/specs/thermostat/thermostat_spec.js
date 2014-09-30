@@ -19,9 +19,9 @@ describe('Models', function(){
       fs.readFile(thermostatFile, 'utf8', function(err, data){
         if(err){ done(err); }
         else{
-          var parsedData = JSON.parse(data);
-          parsedData.lastConnection = new Date(parsedData.lastConnection);
-          that.sampleThermostat = new Thermostat(parsedData);
+          that.parsedData = JSON.parse(data);
+          that.parsedData.lastConnection = new Date(that.parsedData.lastConnection);
+          that.sampleThermostat = new Thermostat(that.parsedData);
           that.sampleThermostat.save(function(err, doc){
             if(err) done(err);
             done();
@@ -84,10 +84,22 @@ describe('Models', function(){
       });
     });
 
-    describe('.save', function(){
-      it('should save the object', function(){
-        var thermostat = new Thermostat({});
-        chai.expect(thermostat).to.be.an.instanceof(Thermostat);
+    describe('when saving a thermostat', function(){
+      before(function(){
+        //clear the db from the other thermostat.
+        Thermostat.remove({}, function(err, docs){
+          if(err) console.log('error clearing the database');
+        });
+      });
+
+      it('should be able to save a new object', function(done){
+        var thermostat = new Thermostat(this.parsedData);
+        thermostat.save(function(err, doc){
+          if(err) 
+            done(err);
+          chai.expect(thermostat.isNew).to.be.false;
+          done();
+        });
       });
     });
   });
