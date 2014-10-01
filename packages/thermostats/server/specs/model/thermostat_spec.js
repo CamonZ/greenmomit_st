@@ -1,26 +1,20 @@
 'use strict';
 
-var config = require('meanio').loadConfig();
-
-require('mocha-mongoose')(config.db);
+var config = require('meanio').loadConfig(),
+    clearDB = require('mocha-mongoose')(config.db, {noClear: true});
 
 var mongoose = require('mongoose'),
     Thermostat = mongoose.model('Thermostat'),
     chai = require('chai'),
     sharedMeasurementSpecs = require('./thermostat_measurements_finders_shared_spec.js'),
-    fs = require('fs');
+    util = require('../util/thermostatUtils');
 
 describe('Models', function(){
-  
+  beforeEach(function(done){ clearDB(done); });
+
   describe('Thermostat', function(){
-    before(function(done){
-      var thermostatFile = __dirname + '/sampleThermostat.json',
-          data = fs.readFileSync(thermostatFile, 'utf8');
-
-      this.parsedData = JSON.parse(data);
-      this.parsedData.lastConnection = new Date(this.parsedData.lastConnection);
-      this.sampleThermostat = new Thermostat(this.parsedData);
-
+    beforeEach(function(done){
+      this.sampleThermostat = new Thermostat(util.sampleThermostatData());
       this.sampleThermostat.save(function(err, doc){
         if(err){ done(err); }
         done();
@@ -52,21 +46,6 @@ describe('Models', function(){
       });
 
       describe('.addMeasurement', function(){
-        before(function(done){
-          var measurementFile = __dirname + '/sampleMeasurement.json', data;
-          if(this.sampleThermostat !== undefined && 
-             this.sampleThermostat !== null){
-            
-            data = fs.readFileSync(measurementFile, 'utf8');
-            this.sampleMeasurementData = JSON.parse(data);
-            this.sampleMeasurementData.recordTime = new Date(this.sampleMeasurementData.recordTime);
-            done();
-          }
-          else{
-            done('Sample thermostat is not defined');
-          }
-        });
-
         it('should add a measurement to the thermostat', function(done){
           var that = this, 
               callback = function(err, measurement){
@@ -75,21 +54,16 @@ describe('Models', function(){
                 done();
               };
 
-          this.sampleThermostat.addMeasurement(this.sampleMeasurementData, callback);
+          this.sampleThermostat.addMeasurement(util.sampleMeasurementData(), callback);
         });
       });
     });
 
     describe('when saving a thermostat', function(){
-      before(function(){
-        //clear the db from the other thermostat.
-        Thermostat.remove({}, function(err, docs){
-          if(err) console.log('error clearing the database');
-        });
-      });
+      beforeEach(function(done){ clearDB(done); });
 
       it('should be able to save a new object', function(done){
-        var thermostat = new Thermostat(this.parsedData);
+        var thermostat = new Thermostat(util.sampleThermostatData());
         thermostat.save(function(err, doc){
           if(err) 
             done(err);
