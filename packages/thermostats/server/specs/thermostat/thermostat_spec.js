@@ -14,21 +14,19 @@ describe('Models', function(){
   
   describe('Thermostat', function(){
     before(function(done){
-      var that = this, thermostatFile = __dirname + '/sampleThermostat.json';
+      var thermostatFile = __dirname + '/sampleThermostat.json',
+          data = fs.readFileSync(thermostatFile, 'utf8');
 
-      fs.readFile(thermostatFile, 'utf8', function(err, data){
+      this.parsedData = JSON.parse(data);
+      this.parsedData.lastConnection = new Date(this.parsedData.lastConnection);
+      this.sampleThermostat = new Thermostat(this.parsedData);
+
+      this.sampleThermostat.save(function(err, doc){
         if(err){ done(err); }
-        else{
-          that.parsedData = JSON.parse(data);
-          that.parsedData.lastConnection = new Date(that.parsedData.lastConnection);
-          that.sampleThermostat = new Thermostat(that.parsedData);
-          that.sampleThermostat.save(function(err, doc){
-            if(err) done(err);
-            done();
-          });
-        }
+        done();
       });
     });
+
     describe('schema methods', function(){
       before(function(){ this.thermostat = new Thermostat({}); });
 
@@ -55,17 +53,14 @@ describe('Models', function(){
 
       describe('.addMeasurement', function(){
         before(function(done){
-          var that = this;
-          var measurementFile = __dirname + '/sampleMeasurement.json';
+          var measurementFile = __dirname + '/sampleMeasurement.json', data;
           if(this.sampleThermostat !== undefined && 
              this.sampleThermostat !== null){
             
-            fs.readFile(measurementFile, 'utf8', function(err, data){
-              if(err) done('error reading sample measurement file');
-              that.sampleMeasurementData = JSON.parse(data);
-              that.sampleMeasurementData.recordTime = new Date(that.sampleMeasurementData.recordTime);
-              done();
-            });
+            data = fs.readFileSync(measurementFile, 'utf8');
+            this.sampleMeasurementData = JSON.parse(data);
+            this.sampleMeasurementData.recordTime = new Date(this.sampleMeasurementData.recordTime);
+            done();
           }
           else{
             done('Sample thermostat is not defined');
@@ -73,11 +68,12 @@ describe('Models', function(){
         });
 
         it('should add a measurement to the thermostat', function(done){
-          var that = this, callback = function(err, measurement){
-            if(err) done(err);
-            chai.expect(measurement.thermostatId).to.eq(that.sampleThermostat._id);
-            done();
-          };
+          var that = this, 
+              callback = function(err, measurement){
+                if(err) done(err);
+                chai.expect(measurement.thermostatId).to.eq(that.sampleThermostat._id);
+                done();
+              };
 
           this.sampleThermostat.addMeasurement(this.sampleMeasurementData, callback);
         });
