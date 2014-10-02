@@ -14,11 +14,11 @@ exports.sampleThermostatData = function(){
   return data;
 };
 
-exports.sampleMeasurementData = function(){
+exports.sampleMeasurementData = function(thermostatId){
   var measurementFile = __dirname + '/../model/sampleMeasurement.json', data;
   data = JSON.parse(fs.readFileSync(measurementFile, 'utf8'));
   data.recordTime = new Date(data.recordTime);
-  console.log('recordTime: ' + data.recordTime);
+  data.thermostatId = thermostatId;
   return data;
 };
 
@@ -36,4 +36,16 @@ exports.baseAppURL = function(){
 
 exports.thermostatsURL = function(){
   return this.baseAppURL() + 'thermostats/';
+};
+
+exports.thermostatURL = function(thermostatId){
+  return this.thermostatsURL() + thermostatId + '/';
+};
+
+exports.thermostatMeasurementsURL = function(thermostatId){
+  return this.thermostatURL(thermostatId) + 'historic_temperatures';
+};
+
+exports.serialize = function(object){
+  return JSON.parse(JSON.stringify(object));
 };

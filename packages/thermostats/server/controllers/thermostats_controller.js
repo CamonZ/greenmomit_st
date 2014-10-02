@@ -11,24 +11,16 @@ exports.index = function(req, res){
 };
 
 exports.show = function(req, res){
-  Thermostat.findOne({_id: req.params.thermostatId}, function(err, doc){
-    res.json(doc);
+  Thermostat.findById(req.params.thermostatId, function(err, doc){
+    if(err !== null || doc === null) res.status(404).send({});
+    else res.json(doc);
   });
 };
 
 exports.historic = function(req, res){
   var query = ThermostatMeasurement.find({thermostatId: req.params.thermostatId}).limit(20); //return the last 20 measurements
   query.exec(function(err, docs){
-    res.json(docs);
+    if(docs.length !== 0) res.json(docs);
+    else res.status(404).send([]);
   });
-  
 };
-
-function getDayDate(hour, min, sec, milli){
-  var d = new Date();
-  d.setHours(hour, min, sec, milli);
-  return d;
-}
-
-function startOfToday(){ return getDayDate(0, 0, 0, 0); }
-function endOfToday(){ return getDayDate(23, 59, 59, 999); }
