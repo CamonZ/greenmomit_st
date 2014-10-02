@@ -7,7 +7,8 @@ var mongoose = require('mongoose'),
     Thermostat = mongoose.model('Thermostat'),
     chai = require('chai'),
     sharedMeasurementSpecs = require('./thermostat_measurements_finders_shared_spec.js'),
-    util = require('../util/thermostatUtils');
+    util = require('../util/thermostatUtils'),
+    nodeUtil = require('util');
 
 describe('Models', function(){
   beforeEach(function(done){ clearDB(done); });
@@ -62,13 +63,32 @@ describe('Models', function(){
     describe('when saving a thermostat', function(){
       beforeEach(function(done){ clearDB(done); });
 
-      it('should be able to save a new object', function(done){
-        var thermostat = new Thermostat(util.sampleThermostatData());
-        thermostat.save(function(err, doc){
-          if(err) 
-            done(err);
-          chai.expect(thermostat.isNew).to.be.false;
-          done();
+      describe('if there\'s no thermostats with the same greenMomitId', function(){
+        it('should be able to save the new thermostat', function(done){
+          var thermostat = new Thermostat(util.sampleThermostatData());
+          thermostat.save(function(err, doc){
+            if(err) 
+              done(err);
+            chai.expect(thermostat.isNew).to.be.false;
+            done();
+          });
+        });
+      });
+
+      describe('if there\'s a thermostat with the same greenMomitId', function(){
+        it('should not be able to save the new thermostat', function(done){
+          var thermostat = util.sampleThermostat();
+          thermostat.save(function(err, doc){
+            if(err) done(err);
+
+            var otherThermostat = util.sampleThermostat();
+            otherThermostat.save(function(err, doc){
+              chai.expect(err).to.not.be.null;
+              chai.expect(err.code).to.eql(11000);
+              chai.expect(doc).to.be.undefined;
+              done();
+            });
+          });
         });
       });
     });
